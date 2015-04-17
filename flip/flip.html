@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+<head>
+<title></title>
+</head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<body style="margin:0;overflow:hidden">
+<canvas style="border:0px solid;margin:auto;padding:0;outline:none" id="canvas"></canvas>
+</body>
+</html>
+<script>
+window.onload = function() {
+    setTimeout(function() {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        var canvas = document.getElementById("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#E5F1B7";
+        ctx.fillRect(0, 0, w, h);
+    
+        var xn = 2, yn = 2;
+        var xl = 5, yl = 5;
+        var db = 3;
+        var cw, ch;
+        var t = cw_ch(w, h, xn, yn);
+        cw = t[0]; ch = t[1];
+        var b = [], d = []; for (var i = 0; i < xl; i++) { b[i] = []; d[i] = []; }
+        var _b = []; for (var i = 0; i < xl; i++) _b[i] = [];
+        var c = ["#F75C5C", "#FFA555", "#EDF35E", "#ACF36D", "#60E25E",
+                 "#60FFA1", "#79C3F5", "#B56CF8", "#FA83E2", "#FFBED3"];
+        var t = s(b, d, cw, ch, xn, yn, c, ctx, db);
+        b = t[0]; d = t[1];
+        var l = false;
+        var tx, ty, bx, by;
+        var m, mm;
+        var n = 0;
+        var pt = 0;
+
+        for(var j = 0; j < xn; j++)
+            for(var i = 0; i < yn; i++) {
+                n = 0; m = 0;
+                l = false;
+                for(var _j = 0; _j < xn; _j++)
+                    for(var _i = 0; _i < yn; _i++) { d[_i][_j] = 0; _b[_i][_j] = b[_i][_j]; }
+                while (n < xn * yn) {
+                    n = 0;
+                    var t = f(_b, d, tx, ty, bx, by, xn, yn, i, j, c, cw, ch, ctx, db, l, 0, m);
+                    tx = t[0][0]; ty = t[0][1]; bx = t[0][2]; by = t[0][3]; n = t[0][4]; l = t[0][5]; m = t[0][6]; d = t[1];
+                }
+                if ((i == 0) && (j == 0)) mm = m; if (m < mm) mm = m;
+                for(var _j = 0; _j < xn; _j++)
+                    for(var _i = 0; _i < yn; _i++) d[_i][_j] = 0;
+            }
+        p(w, h, cw, ch, xn, yn, c, ctx, db); pp(w, h, xn, yn, cw, ch, c, ctx, pt, 0);
+        tt(w, h, xn, yn, cw, ch, c, ctx, db, mm);
+
+        l = false; n = 0; m = 0; pt = 0;
+        var rect = canvas.getBoundingClientRect();
+        canvas.onclick = function(e) {
+            var i = parseInt((e.clientX - rect.left) / cw);
+            var j = parseInt((e.clientY - rect.top) / ch);
+            if ((i < xn) && (j < yn)) {
+                var t = f(b, d, tx, ty, bx, by, xn, yn, i, j, c, cw, ch, ctx, db, l, 1, m);
+                tx = t[0][0]; ty = t[0][1]; bx = t[0][2]; by = t[0][3];
+                if (m < mm) { pt = pt + (t[0][4] - n) * db * 2; }
+                else { pt = pt - (t[0][4] - n) * db * 4; }
+                n = t[0][4]; l = t[0][5]; m = t[0][6]; d = t[1];
+                pp(w, h, xn, yn, cw, ch, c, ctx, pt, m);
+                if (n == xn * yn) {
+                    ctx.fillStyle = "#E5F1B7";
+                    ctx.fillRect(0, 0, w, h);
+                    xn = xn + 1; yn = yn + 1;
+                    if ((xn > xl) || (yn > yl)) { xn = 2; yn = 2; if (db <= c.length) db = db + 1; }
+                    if (db <= c.length) {
+                        var t = cw_ch(w, h, xn, yn);
+                        cw = t[0]; ch = t[1];
+                        var t = s(b, d, cw, ch, xn, yn, c, ctx, db);
+                        b = t[0]; d = t[1];
+                        n = 0;
+                        for(var j = 0; j < xn; j++)
+                            for(var i = 0; i < yn; i++) {
+                                n = 0; m = 0;
+                                l = false;
+                                for(var _j = 0; _j < xn; _j++)
+                                    for(var _i = 0; _i < yn; _i++) { d[_i][_j] = 0; _b[_i][_j] = b[_i][_j]; }
+                                while (n < xn * yn) {
+                                    n = 0; m = m + 1;
+                                    var t = f(_b, d, tx, ty, bx, by, xn, yn, i, j, c, cw, ch, ctx, db, l, 0);
+                                    tx = t[0][0]; ty = t[0][1]; bx = t[0][2]; by = t[0][3]; n = t[0][4]; l = t[0][5]; d = t[1];
+                                }
+                                if ((i == 0) && (j == 0)) mm = m; if (m < mm) mm = m;
+                                for(var _j = 0; _j < xn; _j++)
+                                    for(var _i = 0; _i < yn; _i++) d[_i][_j] = 0;
+                            }
+                        n = 0;
+                        m = 0; ct = 60;
+                        p(w, h, cw, ch, xn, yn, c, ctx, db); pp(w, h, xn, yn, cw, ch, c, ctx, pt, m);
+                        ci = tt(w, h, xn, yn, cw, ch, c, ctx, db, mm);
+                        l = false;
+                    } else {
+                        canvas.onclick = function() { return false; }
+                        var x = parseInt((w - ctx.measureText("Points: " + pt).width) / 2); /**/ var y = parseInt((h - 12) / 2);
+                        ctx.font = "12px monospace"; ctx.fillStyle = "#000000";
+                        ctx.fillText("Points: " + pt, x, y);
+                    }
+                }
+            }
+        }
+    }, (navigator.userAgent.toString().indexOf("Mobile") == -1 ? 0 : 500));
+}
+function f(b, d, tx, ty, bx, by, xn, yn, i, j, c, cw, ch, ctx, db, l, fill, m) {
+    if (l) {
+        if (d[i][j] == 1) {
+            m = m + 1;
+            for (var y = ty; y <= by; y++)
+                for (var x = tx; x <= bx; x++)
+                    if (d[x][y] == 1) {
+                        b[x][y] = ((b[x][y] + 1) % db);
+                        if (fill) { ctx.fillStyle = c[b[x][y]]; ctx.fillRect(x * cw, y * ch, cw, ch); }
+                    }
+        }
+    } else {
+        m = m + 1;
+        b[i][j] = ((b[i][j] + 1) % db);
+        if (fill) { ctx.fillStyle = c[b[i][j]]; ctx.fillRect(i * cw, j * ch, cw, ch); }
+        tx = bx = i; ty = by = j;
+        if ((i-1) >= 0) if (b[i][j] == b[i-1][j]) { tx = i-1; d[i-1][j] = 1; d[i][j] = 1; l = true; }
+        if ((j-1) >= 0) if (b[i][j] == b[i][j-1]) { ty = j-1; d[i][j-1] = 1; d[i][j] = 1; l = true; }
+        if ((i+1) < yn) if (b[i][j] == b[i+1][j]) { bx = i+1; d[i+1][j] = 1; d[i][j] = 1; l = true; }
+        if ((j+1) < yn) if (b[i][j] == b[i][j+1]) { by = j+1; d[i][j+1] = 1; d[i][j] = 1; l = true; }
+    }
+    if (d[i][j] == 1) {
+        var n = true;
+        while (n) {
+            n = false;
+            for (var y = ty; y <= by; y++)
+                for (var x = tx; x <= bx; x++)
+                    if (d[x][y] == 1) {
+                        if ((x-1) >= 0) if (b[x][y] == b[x-1][y]) { if (d[x-1][y] == 0) { n=true; if ((x-1) < tx) tx=x-1; d[x-1][y]=1; } }
+                        if ((y-1) >= 0) if (b[x][y] == b[x][y-1]) { if (d[x][y-1] == 0) { n=true; if ((y-1) < ty) ty=y-1; d[x][y-1]=1; } }
+                        if ((x+1) < xn) if (b[x][y] == b[x+1][y]) { if (d[x+1][y] == 0) { n=true; if ((x+1) > bx) bx=x+1; d[x+1][y]=1; } }
+                        if ((y+1) < yn) if (b[x][y] == b[x][y+1]) { if (d[x][y+1] == 0) { n=true; if ((y+1) > by) by=y+1; d[x][y+1]=1; } }
+                    }
+        }
+    }
+    var n = 0;
+    for (var y = ty; y <= by; y++)
+        for (var x = tx; x <= bx; x++)
+            if (d[x][y] == 1)
+                n = n + 1;
+    var t = []; t[0] = [tx, ty, bx, by, n, l, m]; t[1] = d; return t;
+}
+function cw_ch(w, h, xn, yn) {
+    if (w >= h) { cw = parseInt(h / xn); /**/ ch = parseInt(h / yn); }
+    else { cw = parseInt(w / xn); /**/ ch = parseInt(w / yn); }
+    var t = []; t[0] = cw; t[1] = ch; return t;
+}
+function s(b, d, cw, ch, xn, yn, c, ctx, db) {
+    for (var j = 0; j < xn; j++)
+        for (var i = 0; i < yn; i++) {
+            var t = parseInt(Math.random() * c.length) % db;
+            b[i][j] = t; d[i][j] = 0;
+            ctx.fillStyle = c[t];
+            ctx.fillRect(i * cw, j * ch, cw, ch);
+        }
+    var t = []; t[0] = b; t[1] = d; return t;
+}
+function p(w, h, cw, ch, xn, yn, c, ctx, db) {
+    if (w >= h) {
+        cw = parseInt(h / (2 * c.length)); /**/ ch = parseInt(h / (2 * c.length));
+        for (var i = 0; i < db; i++) {
+            ctx.fillStyle = c[i];
+            ctx.fillRect(w - cw, ch * i, cw, ch);
+            ctx.fillRect(w - cw, h - ch * (i + 1), cw, ch);
+            ctx.fillRect(w - 2 * cw, ch * c.length - ch * (i + 1), cw, ch);
+            ctx.fillRect(w - 2 * cw, h - ch * c.length + ch * i, cw, ch);
+        }
+    } else {
+        cw = parseInt(w / (2 * c.length)); /**/ ch = parseInt(w / (2 * c.length));
+        for (var i = 0; i < db; i++) {
+            ctx.fillStyle = c[i];
+            ctx.fillRect(cw * i, h - ch, cw, ch);
+            ctx.fillRect(w - cw * (i + 1), h - ch, cw, ch);
+            ctx.fillRect(cw * c.length - cw * (i + 1), h - 2 * ch, cw, ch);
+            ctx.fillRect(w - cw * c.length + cw * i, h - 2 * ch, cw, ch);
+        }
+    }
+}
+function pp(w, h, xn, yn, cw, ch, c, ctx, pt, m) {
+    var x, y;
+    if (w >= h) { x = cw * xn + 2 * c.length; y = h - 2 * c.length; }
+    else { x = w - c.length * c.length; y = ch * yn + 2 * c.length; }
+    ctx.font = "12px monospace"; ctx.fillStyle = "#E5F1B7";
+    ctx.fillRect(x, y - 12, ctx.measureText("Moves: " + m).width, 12);
+    ctx.fillRect(x, y, ctx.measureText("Points: " + pt).width + 2 * 12, 12);
+    ctx.fillStyle = "#000000"; ctx.fillText("Moves: " + m, x, y);
+    ctx.fillText("Points: " + pt, x, y + 12);
+}
+function tt(w, h, xn, yn, cw, ch, c, ctx, db, mm) {
+        var x, y;
+        if (w >= h) { x = cw * xn + 2 * c.length; y = 2 * c.length; }
+        else { x = 2 * c.length; y = ch * yn + 2 * c.length; }
+        ctx.font = "12px monospace"; ctx.fillStyle = "#E5F1B7";
+        ctx.fillRect(x, y - 12, ctx.measureText("Colors: " + db).width, 12);
+        ctx.fillRect(x, y, ctx.measureText("Min. Moves: " + mm).width, 12);
+        ctx.fillStyle = "#000000"; ctx.fillText("Colors: " + db, x, y);
+        ctx.fillText("Min. Moves: " + mm, x, y + 12);
+}
+</script>
